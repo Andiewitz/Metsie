@@ -5,11 +5,11 @@
   "description": "Next.js frontend + modular Django services with 7-day httpOnly JWT cookies",
   "scripts": {
     "dev": "./dev.sh",
-    "test": "bash scripts/run_unit_tests.sh",
-    "test:unit": "bash scripts/run_unit_tests.sh",
-    "test:e2e": "bash scripts/run_e2e_tests.sh",
-    "lint": "bash scripts/run_lint.sh",
-    "lint:backend": "services/.venv/bin/ruff check services/",
-    "lint:frontend": "cd client && npm run lint"
+    "test": "bash tests/unit-test/run.sh",
+    "test:unit": "bash tests/unit-test/run.sh",
+    "test:e2e": "bash tests/e2e/run.sh",
+    "lint": "bash tests/lint/run.sh",
+    "lint:backend": "bash tests/lint/run.sh --backend",
+    "lint:frontend": "bash tests/lint/run.sh --frontend"
   }
 }

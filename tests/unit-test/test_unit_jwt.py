@@ -7,13 +7,12 @@ tamper detection, and httpOnly cookie attributes.
 from datetime import datetime, timedelta, timezone
 
 import jwt
+from auth.jwt import decode_jwt_token, delete_auth_cookie, generate_jwt_token, set_auth_cookie
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
 from rest_framework.exceptions import AuthenticationFailed
-
-from auth.jwt import decode_jwt_token, delete_auth_cookie, generate_jwt_token, set_auth_cookie
 
 
 class JWTUnitTests(TestCase):

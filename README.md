@@ -40,11 +40,15 @@ Metsie/
 │   │   ├── authentication.py   # DRF CookieJWTAuthentication backend
 │   │   ├── serializers.py      # Registration, Login, and User serializers
 │   │   ├── views.py            # Register, Login, Logout, and Me endpoints
-│   │   ├── account_setup.py    # Dedicated account onboarding service & view
-│   │   ├── urls.py             # Auth route mappings
-│   │   └── tests.py            # Unit tests for auth & cookies
+│   │   └── account_setup.py    # Dedicated account onboarding service & view
+│   │   └── urls.py             # Auth route mappings
 │   ├── requirements.txt
 │   └── .env                    # Environment config
+│
+├── tests/                      # Root test suites and runners
+│   ├── unit-test/              # Unit tests (JWT, Login, Account Setup) & run.sh
+│   ├── e2e/                    # End-to-end integration flow tests & run.sh
+│   └── lint/                   # Backend Ruff & Frontend ESLint runner run.sh
 │
 ├── nginx/
 │   └── nginx.conf              # Production Nginx reverse proxy configuration
@@ -86,16 +90,19 @@ Tests and lint checks are strictly separated into dedicated scripts and npm comm
 ```bash
 # 1. Run Unit Tests (JWT, Login Auth & Cookies, Account Setup)
 npm run test:unit
+# Or directly: bash tests/unit-test/run.sh
 
 # 2. Run End-to-End Flow Tests (Full User Lifecycle)
 npm run test:e2e
+# Or directly: bash tests/e2e/run.sh
 
 # 3. Run Lint Checks (Backend Ruff + Frontend ESLint)
 npm run lint
+# Or directly: bash tests/lint/run.sh
 
 # Or individually:
-npm run lint:backend   # Ruff check services/
-npm run lint:frontend  # ESLint in client/
+npm run lint:backend   # bash tests/lint/run.sh --backend
+npm run lint:frontend  # bash tests/lint/run.sh --frontend
 ```
 
 ### What the Unit Tests Verify (`npm run test:unit`):
@@ -197,3 +204,10 @@ docker compose up --build -d
 | `GET` | `/api/auth/me/` | Retrieve current authenticated user | Yes (Cookie) |
 | `GET` | `/api/auth/account-setup/` | Get onboarding details | Yes (Cookie) |
 | `POST` | `/api/auth/account-setup/` | Save onboarding profile details | Yes (Cookie) |
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+

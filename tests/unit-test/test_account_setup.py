@@ -3,12 +3,11 @@
 Tests post-registration onboarding logic and profile persistence.
 """
 
+from auth.jwt import generate_jwt_token
 from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
-
-from auth.jwt import generate_jwt_token
 
 
 class AccountSetupTests(TestCase):
