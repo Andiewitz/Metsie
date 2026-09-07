@@ -1,0 +1,113 @@
+version: '3.9'
+
+services:
+  # =========================================================================
+  # Dedicated PostgreSQL Database (Seated specifically for the Auth Service)
+  # =========================================================================
+  auth-db:
+    image: postgres:16-alpine
+    container_name: metsie-auth-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth_db}
+      POSTGRES_USER: ${AUTH_DB_USER:-auth_user}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-auth_secure_password_2026}
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER:-auth_user} -d ${AUTH_DB_NAME:-auth_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - auth_internal_net
+
+  # =========================================================================
+  # Auth Service (Django Backend)
+  # =========================================================================
+  auth-service:
+    build:
+      context: ./services
+      dockerfile: Dockerfile
+    container_name: metsie-auth-service
+    restart: unless-stopped
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-docker-secret-key-998877665544}
+      DEBUG: "False"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,auth-service,nginx"
+      CORS_ALLOWED_ORIGINS: "http://localhost,http://localhost:3000,http://127.0.0.1:3000"
+      
+      # Connect directly to the dedicated auth database
+      DB_ENGINE: "django.db.backends.postgresql"
+      DB_NAME: ${AUTH_DB_NAME:-auth_db}
+      DB_USER: ${AUTH_DB_USER:-auth_user}
+      DB_PASSWORD: ${AUTH_DB_PASSWORD:-auth_secure_password_2026}
+      DB_HOST: "auth-db"
+      DB_PORT: "5432"
+      
+      # 7-Day HttpOnly JWT Settings
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-jwt-docker-secret-key-112233445566778899}
+      JWT_ALGORITHM: "HS256"
+      JWT_EXPIRATION_DAYS: "7"
+      COOKIE_SECURE: "False"
+    ports:
+      - "8000:8000"
+    networks:
+      - auth_internal_net
+      - app_net
+
+  # =========================================================================
+  # Client (Next.js Frontend)
+  # =========================================================================
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: metsie-client
+    restart: unless-stopped
+    environment:
+      NODE_ENV: "production"
+      BACKEND_INTERNAL_URL: "http://auth-service:8000"
+    ports:
+      - "3000:3000"
+    networks:
+      - app_net
+
+  # =========================================================================
+  # Reverse Proxy (Nginx)
+  # =========================================================================
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: metsie-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - client
+      - auth-service
+    networks:
+      - app_net
+
+# ===========================================================================
+# Volumes & Networks (Isolated auth database network)
+# ===========================================================================
+volumes:
+  auth_postgres_data:
+    name: metsie_auth_postgres_data
+
+networks:
+  # Private network strictly between the auth service and its dedicated Postgres database
+  auth_internal_net:
+    name: metsie_auth_internal_net
+    internal: true
+
+  # Public network connecting Nginx, the Next.js client, and service APIs
+  app_net:
+    name: metsie_app_net

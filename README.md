@@ -166,12 +166,24 @@ Visit [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 🌐 Production with Nginx
+---
 
-When deploying behind Nginx:
-- Use the configuration in [`nginx/nginx.conf`](nginx/nginx.conf).
-- Nginx proxies `/api/` to the Django backend (port 8000) and `/` to the Next.js frontend (port 3000).
-- Cookie headers (`Set-Cookie` and `Cookie`) pass through transparently.
+## 🐳 Container Architecture: Dedicated Auth PostgreSQL & Dockerfiles
+
+The stack includes production-ready Dockerfiles and a `docker-compose.yml` that implements the **Database-per-Service** pattern:
+
+- **Dedicated Auth DB (`auth-db`)**: Runs PostgreSQL 16 Alpine specifically for the authentication service. It is attached to an internal private network (`auth_internal_net`), strictly isolating it from external traffic.
+- **Auth Service (`auth-service`)**: Built with [`services/Dockerfile`](services/Dockerfile), connects to `auth-db` via the internal network, waits for database readiness, runs migrations automatically on container start, and serves requests via Gunicorn.
+- **Client (`client`)**: Multi-stage build in [`client/Dockerfile`](client/Dockerfile) using Node 20 Alpine and a non-root system user.
+- **Nginx (`nginx`)**: Reverse proxy in [`nginx/Dockerfile`](nginx/Dockerfile) and [`nginx/nginx.conf`](nginx/nginx.conf) routing `/api/` to `auth-service` and `/` to `client`.
+
+### Running with Docker (When Ready)
+
+```bash
+docker compose up --build -d
+```
+
+> **Note**: For local development on machines with limited resources, you don't need to run Docker. You can run `./dev.sh` to run the frontend and backend locally with SQLite.
 
 ---
 

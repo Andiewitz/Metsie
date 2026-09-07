@@ -62,14 +62,28 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# Database
-# Default: SQLite for fast, painless setup. Replace with PostgreSQL/MySQL in production as needed.
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+# Database Configuration
+# Dedicated PostgreSQL configuration for the auth service, with fallback to SQLite for local development.
+DB_ENGINE = os.getenv("DB_ENGINE", "django.db.backends.sqlite3")
+
+if "postgresql" in DB_ENGINE:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "auth_db"),
+            "USER": os.getenv("DB_USER", "auth_user"),
+            "PASSWORD": os.getenv("DB_PASSWORD", "auth_secure_password_2026"),
+            "HOST": os.getenv("DB_HOST", "auth-db"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
