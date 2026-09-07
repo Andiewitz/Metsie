@@ -1,0 +1,45 @@
+# Node / Next.js
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+build/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python & Django
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+**/.venv/
+ENV/
+*.sqlite3
+services/db.sqlite3
+services/staticfiles/
+.ruff_cache/
+**/.ruff_cache/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+services/.env
+!services/.env.example
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
