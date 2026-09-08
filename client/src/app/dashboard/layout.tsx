@@ -4,7 +4,7 @@ import React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/context/AuthContext"
-import { Home, Tv, Settings, Power, Users } from "lucide-react"
+import { Home, Tv, Settings, Power } from "lucide-react"
 import { ProfileSidebar } from "@/components/ProfileSidebar"
 
 const TABS = [
@@ -89,13 +89,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        {/* Right: Friends / Profile counter indicator */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-zinc-300 text-xs font-mono font-medium">
-            <Users className="h-3.5 w-3.5 text-zinc-400" />
-            <span className="text-[11px] text-zinc-300">13</span>
-          </div>
-        </div>
+        {/* Right side spacer */}
+        <div className="w-8" />
       </header>
 
       {/* ── Body: Main Canvas + Profiles Sidebar on the right ─────────── */}
