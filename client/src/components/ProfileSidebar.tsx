@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
 import { Users, Wifi } from "lucide-react"
 import {
@@ -63,12 +64,12 @@ export function ProfileSidebar() {
           {user && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="relative group cursor-pointer">
+                <Link href="/dashboard/settings" className="relative group cursor-pointer block">
                   <div className="w-9 h-9 rounded-md bg-gradient-to-tr from-violet-600 to-fuchsia-600 border border-violet-400/50 flex items-center justify-center text-xs font-black text-white shadow-sm shadow-violet-500/30 group-hover:scale-105 transition">
                     {userInitials}
                   </div>
                   <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-zinc-950" />
-                </div>
+                </Link>
               </TooltipTrigger>
               <TooltipContent side="left" className="font-sub space-y-1">
                 <div className="flex items-center gap-2 font-bold text-white text-xs">

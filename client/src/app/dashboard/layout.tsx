@@ -44,12 +44,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Tv className="h-4 w-4" />
           </button>
-          <button
-            className="p-2 rounded-md text-zinc-400 hover:text-white hover:bg-white/5 transition"
-            title="Settings"
+          <Link
+            href={pathname === "/dashboard/settings" ? "/dashboard" : "/dashboard/settings"}
+            className={`p-2 rounded-md transition ${
+              pathname === "/dashboard/settings"
+                ? "text-violet-400 bg-white/10"
+                : "text-zinc-400 hover:text-white hover:bg-white/5"
+            }`}
+            title="User Profile Settings"
           >
             <Settings className="h-4 w-4" />
-          </button>
+          </Link>
           <button
             onClick={handleLogout}
             className="p-2 rounded-md text-zinc-400 hover:text-red-400 hover:bg-white/5 transition"
