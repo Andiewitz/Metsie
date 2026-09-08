@@ -59,8 +59,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
         </div>
 
-        {/* Center: Main Game Tabs */}
-        <nav className="flex items-center gap-6">
+        {/* Center: Main Game Tabs (Centered relative to the entire screen) */}
+        <nav className="fixed top-0 left-1/2 -translate-x-1/2 h-12 z-50 flex items-center gap-6 pointer-events-auto">
           {TABS.map(({ label, href }) => {
             const isPlay = label === "PLAY"
             const isActive = isPlay && pathname === "/dashboard"
