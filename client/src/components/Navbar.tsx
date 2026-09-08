@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
+import { avatars } from "@/components/ui/avatar-picker"
 
 export function Navbar() {
   const { user, loading, logout } = useAuth()
@@ -39,9 +40,13 @@ export function Navbar() {
               >
                 Log out
               </button>
-              <div className="h-8 w-8 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 flex items-center justify-center font-bold text-xs uppercase">
-                {user.username.slice(0, 2)}
-              </div>
+              <Link
+                href="/dashboard/settings"
+                className="h-8 w-8 rounded-full overflow-hidden border border-violet-500/40 bg-zinc-900 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full hover:scale-105 transition"
+                title="Profile Settings"
+              >
+                {avatars[0].svg}
+              </Link>
             </div>
           ) : (
             <div className="flex items-center gap-2">

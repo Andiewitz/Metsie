@@ -5,13 +5,13 @@ import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
-interface Avatar {
+export interface Avatar {
     id: number;
     svg: React.ReactNode;
     alt: string;
 }
 
-const avatars: Avatar[] = [
+export const avatars: Avatar[] = [
     {
         id: 1,
         svg: (
@@ -343,12 +343,25 @@ interface AvatarPickerProps {
 }
 
 export function AvatarPicker({ displayName = "Me", onSelectAvatar }: AvatarPickerProps) {
-    const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(avatars[0]);
+    const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(() => {
+        if (typeof window !== "undefined") {
+            const saved = localStorage.getItem("metsie_avatar_id");
+            if (saved) {
+                const found = avatars.find((a) => a.id === Number(saved));
+                if (found) return found;
+            }
+        }
+        return avatars[0];
+    });
     const [rotationCount, setRotationCount] = useState(0);
 
     const handleAvatarSelect = (avatar: Avatar) => {
         setRotationCount((prev) => prev + 1080); // Add 3 rotations each time
         setSelectedAvatar(avatar);
+        if (typeof window !== "undefined") {
+            localStorage.setItem("metsie_avatar_id", String(avatar.id));
+            window.dispatchEvent(new Event("metsie_avatar_changed"));
+        }
         onSelectAvatar?.(avatar.id);
     };
 
