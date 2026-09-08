@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  skipTrailingSlashRedirect: true,
   // Enables seamless local development proxying to Django backend
   // Same origin behavior ensures 7-day httpOnly cookies work effortlessly
   async rewrites() {

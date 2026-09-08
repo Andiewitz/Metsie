@@ -4,7 +4,7 @@ Provides endpoints for Registration, Login, Logout, and Current User retrieval.
 Coordinates with jwt.py to attach or wipe 7-day httpOnly cookies.
 """
 
-from rest_framework import permissions, status
+from rest_framework import exceptions, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -46,8 +46,11 @@ class LoginView(APIView):
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except exceptions.PermissionDenied as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_403_FORBIDDEN)
 
         user = serializer.validated_data["user"]
         token = generate_jwt_token(user)

@@ -27,7 +27,7 @@ export default function AccountSetupPage() {
 
     if (user) {
       // Fetch current setup status from dedicated account-setup endpoint
-      apiFetch('/api/auth/account-setup/')
+      apiFetch<{ full_name?: string; company?: string; role?: string; bio?: string }>('/api/auth/account-setup/')
         .then((data) => {
           setFullName(data.full_name || '');
           setCompany(data.company || '');

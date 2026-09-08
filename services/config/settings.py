@@ -12,6 +12,7 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-default-dev-key-change-in-production")
 
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development" if DEBUG else "production").lower()
 
 ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host.strip()]
 
@@ -42,6 +43,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+APPEND_SLASH = False
 
 TEMPLATES = [
     {
@@ -143,3 +145,8 @@ AUTH_COOKIE_SECURE = os.getenv("COOKIE_SECURE", "False").lower() == "true"
 AUTH_COOKIE_HTTP_ONLY = True
 AUTH_COOKIE_SAMESITE = "Lax"
 AUTH_COOKIE_PATH = "/"
+
+# Development dummy credentials (strictly restricted to ENVIRONMENT=development)
+DEV_DUMMY_USERNAME = os.getenv("DEV_DUMMY_USERNAME", "dev").strip()
+DEV_DUMMY_EMAIL = os.getenv("DEV_DUMMY_EMAIL", "dev@metsie.local").strip().lower()
+DEV_DUMMY_PASSWORD = os.getenv("DEV_DUMMY_PASSWORD", "devpassword123")
