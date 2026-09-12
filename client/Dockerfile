@@ -26,7 +26,6 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 RUN addgroup --system --gid 1001 nodejs && \
@@ -41,6 +40,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 USER nextjs
 
+# Railway dynamically assigns PORT — Next.js reads this automatically
 EXPOSE 3000
 
+# next start reads $PORT automatically in Next.js 16+
 CMD ["npm", "start"]

@@ -1,20 +1,27 @@
 import os
 from pathlib import Path
 
+import dj_database_url
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file
+# Load environment variables from .env file (local dev only — Railway injects env vars directly)
 load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-default-dev-key-change-in-production")
 
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development" if DEBUG else "production").lower()
 
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host.strip()]
+# ALLOWED_HOSTS — always include Railway's public domain automatically
+_raw_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()]
+# Automatically include Railway-injected public domain (e.g. metsie-backend.up.railway.app)
+_railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN", "")
+if _railway_domain and _railway_domain not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_railway_domain)
 
 # Application definition
 INSTALLED_APPS = [
@@ -34,6 +41,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    # WhiteNoise: serve static files efficiently from the container
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -64,18 +73,27 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# Database Configuration
-# Dedicated PostgreSQL configuration for the auth service, with fallback to SQLite for local development.
-DB_ENGINE = os.getenv("DB_ENGINE", "django.db.backends.sqlite3")
-
-if "postgresql" in DB_ENGINE:
+# ─── Database Configuration ───────────────────────────────────────────────────
+# Priority 1: DATABASE_URL (Railway Postgres plugin auto-injects this)
+# Priority 2: Individual DB_* env vars (docker-compose / self-managed Postgres)
+# Priority 3: SQLite fallback for bare local development
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif os.getenv("DB_ENGINE", "").find("postgresql") != -1:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": os.getenv("DB_NAME", "auth_db"),
             "USER": os.getenv("DB_USER", "auth_user"),
-            "PASSWORD": os.getenv("DB_PASSWORD", "auth_secure_password_2026"),
-            "HOST": os.getenv("DB_HOST", "auth-db"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "localhost"),
             "PORT": os.getenv("DB_PORT", "5432"),
         }
     }
@@ -110,13 +128,25 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# ─── Static Files ──────────────────────────────────────────────────────────────
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# WhiteNoise compressed static file storage for production
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# REST Framework configuration
+# ─── Security (Production) ────────────────────────────────────────────────────
+# Trust Railway's SSL-terminating reverse proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# CSRF trusted origins — include Railway domain and any configured origins
+_csrf_origins_raw = os.getenv("CSRF_TRUSTED_ORIGINS", "")
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins_raw.split(",") if o.strip()]
+if _railway_domain and f"https://{_railway_domain}" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{_railway_domain}")
+
+# ─── REST Framework ───────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "auth.authentication.CookieJWTAuthentication",
@@ -126,7 +156,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS configuration
+# ─── CORS ─────────────────────────────────────────────────────────────────────
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
@@ -134,19 +164,15 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-# JWT & Cookie configuration (7-day httpOnly)
+# ─── JWT & Cookie Configuration (7-day httpOnly) ─────────────────────────────
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", SECRET_KEY)
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_EXPIRATION_DAYS = int(os.getenv("JWT_EXPIRATION_DAYS", "7"))
 
 AUTH_COOKIE_NAME = "access_token"
 AUTH_COOKIE_MAX_AGE = JWT_EXPIRATION_DAYS * 24 * 60 * 60  # 7 days in seconds
-AUTH_COOKIE_SECURE = os.getenv("COOKIE_SECURE", "False").lower() == "true"
+# In production (non-DEBUG), always set Secure cookies. Can override via COOKIE_SECURE env var.
+AUTH_COOKIE_SECURE = os.getenv("COOKIE_SECURE", "True" if not DEBUG else "False").lower() == "true"
 AUTH_COOKIE_HTTP_ONLY = True
 AUTH_COOKIE_SAMESITE = "Lax"
 AUTH_COOKIE_PATH = "/"
-
-# Development dummy credentials (strictly restricted to ENVIRONMENT=development)
-DEV_DUMMY_USERNAME = os.getenv("DEV_DUMMY_USERNAME", "dev").strip()
-DEV_DUMMY_EMAIL = os.getenv("DEV_DUMMY_EMAIL", "dev@metsie.local").strip().lower()
-DEV_DUMMY_PASSWORD = os.getenv("DEV_DUMMY_PASSWORD", "devpassword123")

@@ -1,20 +1,23 @@
 #!/bin/sh
 set -e
 
-echo "==> Starting Auth Service Container..."
+echo "==> Starting Metsie Auth Service..."
 
-# If PostgreSQL host is provided, wait for it to be reachable
-if [ "$DB_HOST" ]; then
-    echo "==> Waiting for database at $DB_HOST:${DB_PORT:-5432}..."
+# Wait for Postgres when using individual DB_HOST config (docker-compose / non-Railway)
+# On Railway, DATABASE_URL is used and the DB is always ready before deploy completes.
+if [ -z "$DATABASE_URL" ] && [ -n "$DB_HOST" ]; then
+    echo "==> Waiting for database at ${DB_HOST}:${DB_PORT:-5432}..."
     while ! nc -z "$DB_HOST" "${DB_PORT:-5432}"; do
         sleep 1
     done
-    echo "==> Database is reachable and ready!"
+    echo "==> Database is reachable!"
 fi
 
-# Apply migrations to ensure tables exist in the dedicated auth database
+echo "==> Collecting static files..."
+python manage.py collectstatic --noinput
+
 echo "==> Applying database migrations..."
 python manage.py migrate --noinput
 
-echo "==> Executing application process..."
+echo "==> Starting application server..."
 exec "$@"

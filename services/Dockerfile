@@ -2,8 +2,7 @@
 FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
@@ -24,7 +23,9 @@ COPY . .
 # Ensure entrypoint script is executable
 RUN chmod +x /app/docker-entrypoint.sh
 
+# Railway dynamically assigns PORT — default to 8000 for local docker-compose
 EXPOSE 8000
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
+# Bind to Railway's $PORT at runtime; default to 8000 if not set
+CMD sh -c "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120"

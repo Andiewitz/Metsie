@@ -16,16 +16,8 @@ interface PlayerProfile {
   color: string
 }
 
-const MOCK_PLAYERS: PlayerProfile[] = [
-  { id: "1", name: "K3v1n", avatarId: 2, status: "in-game", activity: "Math Blitz · R4", rank: "Diamond", color: "bg-emerald-400" },
-  { id: "2", name: "Nova_X", avatarId: 4, status: "in-game", activity: "Science Sprint", rank: "Master", color: "bg-emerald-400" },
-  { id: "3", name: "ByteCoder", avatarId: 3, status: "online", activity: "In Lobby", rank: "Platinum", color: "bg-blue-400" },
-  { id: "4", name: "Aria_99", avatarId: 1, status: "online", activity: "Main Menu", rank: "Gold", color: "bg-blue-400" },
-  { id: "5", name: "ZeroCool", avatarId: 2, status: "away", activity: "AFK", rank: "Silver", color: "bg-zinc-400" },
-  { id: "6", name: "Ph4ntom", avatarId: 4, status: "in-game", activity: "Algorithms", rank: "Challenger", color: "bg-emerald-400" },
-  { id: "7", name: "Viper", avatarId: 3, status: "online", activity: "In Lobby", rank: "Gold", color: "bg-blue-400" },
-  { id: "8", name: "Echo", avatarId: 1, status: "away", activity: "Away", rank: "Bronze", color: "bg-zinc-400" },
-]
+// Online players list — ready to be populated by real-time lobby/matchmaking backend
+const ONLINE_PLAYERS: PlayerProfile[] = []
 
 export function ProfileSidebar() {
   const { user } = useAuth()
@@ -91,37 +83,44 @@ export function ProfileSidebar() {
         {/* Section title (revealed on hover) */}
         <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 px-1 mb-1 whitespace-nowrap overflow-hidden">
           <span className="text-[10px] font-bold text-zinc-500 font-small tracking-wider uppercase">
-            Players Online ({MOCK_PLAYERS.length})
+            Players Online ({ONLINE_PLAYERS.length})
           </span>
         </div>
 
-        {/* List of players */}
+        {/* List of players or clean empty state */}
         <div className="flex flex-col gap-1 max-h-[50vh] overflow-y-auto no-scrollbar">
-          {MOCK_PLAYERS.map((player) => (
-            <div
-              key={player.id}
-              className="flex items-center gap-3 p-1 rounded-xl hover:bg-white/5 transition cursor-pointer"
-            >
-              {/* Circular preset avatar */}
-              <div className="relative shrink-0">
-                <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 bg-zinc-900 flex items-center justify-center transition [&>svg]:w-full [&>svg]:h-full">
-                  {getAvatarSvg(player.avatarId)}
-                </div>
-                <span
-                  className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 ${player.color}`}
-                />
-              </div>
-
-              {/* Revealed on hover */}
-              <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 min-w-0 overflow-hidden whitespace-nowrap flex-1">
-                <div className="flex items-center justify-between gap-1.5">
-                  <span className="text-xs font-semibold text-zinc-200 truncate font-sub">{player.name}</span>
-                  <span className="text-[9px] text-zinc-500 font-small shrink-0">{player.rank}</span>
-                </div>
-                <p className="text-[10px] text-emerald-400/90 font-small truncate">{player.activity}</p>
-              </div>
+          {ONLINE_PLAYERS.length === 0 ? (
+            <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 px-2 py-3 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+              <p className="text-[11px] text-zinc-400 font-sub">No other players online</p>
+              <p className="text-[9px] text-zinc-600 font-small mt-0.5">Lobby ready for matchmaking</p>
             </div>
-          ))}
+          ) : (
+            ONLINE_PLAYERS.map((player) => (
+              <div
+                key={player.id}
+                className="flex items-center gap-3 p-1 rounded-xl hover:bg-white/5 transition cursor-pointer"
+              >
+                {/* Circular preset avatar */}
+                <div className="relative shrink-0">
+                  <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 bg-zinc-900 flex items-center justify-center transition [&>svg]:w-full [&>svg]:h-full">
+                    {getAvatarSvg(player.avatarId)}
+                  </div>
+                  <span
+                    className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 ${player.color}`}
+                  />
+                </div>
+
+                {/* Revealed on hover */}
+                <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 min-w-0 overflow-hidden whitespace-nowrap flex-1">
+                  <div className="flex items-center justify-between gap-1.5">
+                    <span className="text-xs font-semibold text-zinc-200 truncate font-sub">{player.name}</span>
+                    <span className="text-[9px] text-zinc-500 font-small shrink-0">{player.rank}</span>
+                  </div>
+                  <p className="text-[10px] text-emerald-400/90 font-small truncate">{player.activity}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Bottom ping/server status */}

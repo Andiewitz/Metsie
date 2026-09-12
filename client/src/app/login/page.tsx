@@ -15,16 +15,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  const isDevEnabled = process.env.NEXT_PUBLIC_DEV_CREDENTIALS_ENABLED === "true"
-  const devIdentifier = process.env.NEXT_PUBLIC_DEV_IDENTIFIER || "dev@metsie.local"
-  const devPassword = process.env.NEXT_PUBLIC_DEV_PASSWORD || "devpassword123"
-
-  const fillDevCredentials = () => {
-    setIdentifier(devIdentifier)
-    setPassword(devPassword)
-    setError(null)
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -52,27 +42,6 @@ export default function LoginPage() {
           <h2 className="text-2xl font-extrabold text-white font-main">Welcome back</h2>
           <p className="text-sm text-zinc-400 font-sub">Sign in to continue your streak</p>
         </div>
-
-        {isDevEnabled && (
-          <div className="p-3.5 rounded-xl bg-violet-950/20 border border-violet-500/20 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-violet-400 flex items-center gap-1.5 font-small">
-                <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse" />
-                Dev Mode
-              </span>
-              <button
-                type="button"
-                onClick={fillDevCredentials}
-                className="text-[11px] px-2 py-0.5 rounded bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 font-medium transition cursor-pointer font-small"
-              >
-                Autofill
-              </button>
-            </div>
-            <p className="text-[11px] text-zinc-400 font-mono font-small">
-              {devIdentifier} / {devPassword}
-            </p>
-          </div>
-        )}
 
         {error && (
           <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-small">
