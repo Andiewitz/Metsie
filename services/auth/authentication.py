@@ -2,6 +2,8 @@
 
 Pulls the JWT from request.COOKIES, decodes it, and authenticates the user.
 Falls back to Authorization header (Bearer <token>) if cookies are absent.
+Gracefully returns None on invalid/expired tokens so stale cookies do not
+block login or registration.
 """
 
 from django.conf import settings
@@ -19,7 +21,7 @@ class CookieJWTAuthentication(BaseAuthentication):
         cookie_name = getattr(settings, "AUTH_COOKIE_NAME", "access_token")
         token = request.COOKIES.get(cookie_name)
 
-        # Fallback to Authorization: Bearer <token> for development or external API clients
+        # Fallback to Authorization: Bearer <token> for external API clients
         if not token:
             auth_header = request.headers.get("Authorization", "")
             if auth_header.startswith("Bearer "):
@@ -28,16 +30,23 @@ class CookieJWTAuthentication(BaseAuthentication):
         if not token:
             return None  # Unauthenticated, let DRF permission classes decide
 
-        payload = decode_jwt_token(token)
+        try:
+            payload = decode_jwt_token(token)
+        except AuthenticationFailed:
+            # If the token is invalid, expired, or signed with an old secret key,
+            # treat the user as unauthenticated (None) rather than halting the request.
+            # This allows LoginView and RegisterView to proceed and issue a fresh cookie,
+            # while IsAuthenticated permission classes will still correctly reject protected endpoints.
+            return None
 
         user_id = payload.get("user_id")
         if not user_id:
-            raise AuthenticationFailed("Invalid token payload: missing user identification.")
+            return None
 
         try:
             user = User.objects.get(id=user_id, is_active=True)
         except User.DoesNotExist:
-            raise AuthenticationFailed("User matching this token does not exist or is inactive.")
+            return None
 
         return (user, token)
 

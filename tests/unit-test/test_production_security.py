@@ -98,3 +98,22 @@ class ProductionSecurityTests(TestCase):
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertNotIn("access_token", res.cookies)
+
+    def test_login_with_stale_or_invalid_cookie_succeeds(self):
+        """A user with an old, expired, or invalid cookie can still log in without getting 401."""
+        # Attach an invalid / garbage token to simulates a stale cookie from a previous session
+        self.client.cookies["access_token"] = "invalid.stale.token.from.old.deploy"
+        res = self.client.post(
+            self.login_url,
+            {"username_or_email": "testplayer", "password": "SecurePass2026!"},
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        # Verify a new valid cookie overwrote the old one
+        self.assertIn("access_token", res.cookies)
+        self.assertNotEqual(res.cookies["access_token"].value, "invalid.stale.token.from.old.deploy")
+
+    def test_protected_me_endpoint_with_invalid_cookie_returns_401(self):
+        """A protected endpoint rejects an invalid token with 401."""
+        self.client.cookies["access_token"] = "invalid.tampered.token"
+        res = self.client.get("/api/auth/me/")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
