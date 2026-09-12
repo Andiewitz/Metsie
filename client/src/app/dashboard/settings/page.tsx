@@ -25,7 +25,6 @@ export default function ProfileSettingsPage() {
       return
     }
 
-    // If profile was loaded asynchronously and fields are still empty, populate them
     if (user?.profile) {
       Promise.resolve().then(() => {
         setFullName((prev) => prev || user.profile?.full_name || "")
@@ -71,30 +70,33 @@ export default function ProfileSettingsPage() {
   }
 
   return (
-    <div className="absolute inset-0 z-30 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-zinc-950/40 backdrop-blur-2xl overflow-y-auto animate-in fade-in-0 duration-300">
-      {/* Background ambient lighting subtly visible through glass */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
-        <div className="w-[600px] h-[600px] rounded-full bg-violet-600/10 blur-[130px]" />
-        <div className="w-[400px] h-[400px] rounded-full bg-fuchsia-600/10 blur-[100px]" />
-      </div>
+    <div className="absolute inset-0 z-30 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/40 overflow-y-auto animate-in fade-in-0 duration-200">
+      {/* Real Glass Settings Slab — Bends the sunset landscape directly behind it */}
+      <div className="relative w-full max-w-4xl rounded-[32px] border border-white/30 shadow-[inset_0_1.5px_1.5px_0_rgba(255,255,255,0.55),inset_0_-1.5px_1.5px_0_rgba(0,0,0,0.4),0_25px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col my-auto isolation-auto">
+        {/* Optical refraction layer */}
+        <div className="real-glass-refractor" />
+        <div className="real-glass-tint" />
+        <div className="real-glass-sheen" />
 
-      {/* Glassmorphic settings panel */}
-      <div className="relative w-full max-w-4xl rounded-3xl border border-white/10 bg-zinc-900/60 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col my-auto">
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02]">
+        <div className="relative z-10 flex items-center justify-between px-6 sm:px-8 py-4 border-b border-white/15 bg-white/[0.04]">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-violet-500/20 border border-violet-500/30 flex items-center justify-center text-violet-300">
+            <div className="h-8 w-8 rounded-xl bg-amber-400/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.3)]">
               <Sparkles className="h-4 w-4" />
             </div>
             <div>
-              <h1 className="text-base font-extrabold text-white font-main leading-tight">Profile Settings</h1>
-              <p className="text-xs text-zinc-400 font-small">Customize your avatar, display name, and gamer bio</p>
+              <h1 className="text-base font-black text-white font-main leading-tight drop-shadow-sm">
+                Profile Settings
+              </h1>
+              <p className="text-xs text-zinc-300 font-small">
+                Customize your avatar, gamer tag, and competition bio
+              </p>
             </div>
           </div>
 
           <Link
             href="/dashboard"
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition"
+            className="p-1.5 rounded-xl text-zinc-300 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/20 transition cursor-pointer"
             title="Close"
           >
             <X className="h-5 w-5" />
@@ -102,8 +104,8 @@ export default function ProfileSettingsPage() {
         </div>
 
         {/* Content Body: Avatar Picker on Left, Profile Details on Right */}
-        <div className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left: Avatar Picker Component */}
+        <div className="relative z-10 p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left: Avatar Picker */}
           <div className="lg:col-span-6 flex flex-col items-center">
             <AvatarPicker
               displayName={fullName.trim() || user?.username || "Player"}
@@ -113,69 +115,69 @@ export default function ProfileSettingsPage() {
           {/* Right: Profile Info Form */}
           <form onSubmit={handleSave} className="lg:col-span-6 flex flex-col gap-4">
             {error && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-small">
+              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-small">
                 {error}
               </div>
             )}
 
             {saveSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-small flex items-center gap-2">
+              <div className="p-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-small flex items-center gap-2 shadow-[0_0_15px_rgba(52,211,153,0.2)]">
                 <Check className="h-4 w-4 shrink-0" />
                 Profile changes saved successfully!
               </div>
             )}
 
-            {/* Username (read-only) */}
+            {/* Username / Gamer Tag (Permanent) */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1.5 font-small uppercase tracking-wider">
+              <label className="block text-xs font-extrabold text-amber-200/90 mb-1.5 font-small uppercase tracking-wider drop-shadow-sm">
                 Username / Gamer Tag
               </label>
-              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-zinc-950/80 border border-white/5 text-zinc-400 text-sm font-sub">
-                <User className="h-4 w-4 text-zinc-500" />
-                <span>{user?.username ?? "—"}</span>
-                <span className="ml-auto text-[10px] text-zinc-600 uppercase font-mono">Permanent</span>
+              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-zinc-300 text-sm font-sub shadow-[inset_0_1px_1px_rgba(0,0,0,0.5)]">
+                <User className="h-4 w-4 text-zinc-400" />
+                <span className="font-bold">{user?.username ?? "—"}</span>
+                <span className="ml-auto text-[10px] text-zinc-400 uppercase font-mono">Permanent</span>
               </div>
             </div>
 
             {/* Display Name */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5 font-small uppercase tracking-wider">
+              <label className="block text-xs font-extrabold text-white mb-1.5 font-small uppercase tracking-wider drop-shadow-sm">
                 Display Name
               </label>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Alex Morgan"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition font-sub"
+                placeholder="e.g. ShadowRacer, Alex"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-zinc-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/80 focus:border-transparent transition font-sub shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"
               />
             </div>
 
             {/* Title / Role */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5 font-small uppercase tracking-wider">
+              <label className="block text-xs font-extrabold text-white mb-1.5 font-small uppercase tracking-wider drop-shadow-sm">
                 Competitive Title / Rank
               </label>
               <input
                 type="text"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                placeholder="e.g. Math Blitz Champion"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition font-sub"
+                placeholder="e.g. Science Wizard, Math Blitz Champion"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-zinc-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/80 focus:border-transparent transition font-sub shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"
               />
             </div>
 
             {/* Bio */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5 font-small uppercase tracking-wider">
+              <label className="block text-xs font-extrabold text-white mb-1.5 font-small uppercase tracking-wider drop-shadow-sm">
                 Gamer Bio
               </label>
               <textarea
                 rows={3}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                placeholder="Tell rivals about your speed and favorite topics..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition font-sub resize-none"
+                placeholder="Tell rivals about your speed and favorite subjects..."
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-zinc-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/80 focus:border-transparent transition font-sub resize-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"
               />
             </div>
 
@@ -183,14 +185,14 @@ export default function ProfileSettingsPage() {
             <div className="pt-2 flex items-center justify-between gap-3">
               <Link
                 href="/dashboard"
-                className="px-5 py-2.5 rounded-xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-xs font-bold transition font-main"
+                className="px-5 py-2.5 rounded-xl border border-white/20 text-zinc-300 hover:text-white hover:bg-white/10 text-xs font-black transition font-main cursor-pointer"
               >
                 Back to Lobby
               </Link>
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-500 hover:bg-violet-400 disabled:opacity-50 text-white font-bold text-xs shadow-lg shadow-violet-500/25 transition font-main cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 disabled:opacity-50 text-zinc-950 font-black text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_8px_25px_rgba(245,158,11,0.4)] transition font-main cursor-pointer"
               >
                 <Save className="h-4 w-4" />
                 {saving ? "Saving Changes..." : "Save Profile"}
