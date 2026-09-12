@@ -254,26 +254,21 @@ export default function PlayPage() {
 
   return (
     <div className="absolute inset-0 flex flex-col overflow-hidden">
-      {/* ── TOP: CS2 Mode Sub-Header (Sharp Edges) ─────────────────────────── */}
-      <div className="shrink-0 flex flex-col items-center gap-1.5 pt-2 pb-1.5 px-4 sm:px-6">
-        {/* Row 1: Primary Mode Buttons */}
+
+      {/* ── TOP: Mode Header ── */}
+      <div className="shrink-0 flex flex-col items-center gap-1.5 pt-2 pb-1.5 px-4">
         <div className="flex items-center gap-1.5">
-          <button className="px-5 py-1 border border-cyan-400/80 bg-cyan-500/20 text-cyan-300 text-[11px] font-black tracking-widest uppercase font-small shadow-[0_0_12px_rgba(34,211,238,0.3)] cursor-pointer">
+          <button className="px-5 py-1 border border-cyan-400/80 bg-cyan-500/20 text-cyan-300 text-[11px] font-black tracking-widest uppercase font-small shadow-[0_0_12px_rgba(34,211,238,0.25)] cursor-pointer">
             MATCHMAKING
           </button>
           <button className="px-5 py-1 border border-white/10 bg-black/40 hover:bg-white/10 text-zinc-400 hover:text-zinc-200 text-[11px] font-black tracking-widest uppercase font-small transition cursor-pointer">
             PRACTICE
           </button>
-          <button
-            className="p-1 border border-white/10 bg-black/40 hover:bg-white/10 text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
-            title="Server Region: US East"
-          >
+          <button className="p-1 border border-white/10 bg-black/40 hover:bg-white/10 text-zinc-400 hover:text-zinc-200 transition cursor-pointer" title="Server Region">
             <Globe className="w-3.5 h-3.5" />
           </button>
         </div>
-
-        {/* Row 2: CS2 Match Type Tabs */}
-        <div className="flex items-center gap-4 sm:gap-7 overflow-x-auto no-scrollbar max-w-full pb-0.5">
+        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar w-full justify-center pb-0.5">
           {SUB_MODES.map((mode) => {
             const isActive = activeSubMode === mode
             return (
@@ -281,71 +276,59 @@ export default function PlayPage() {
                 key={mode}
                 onClick={() => setActiveSubMode(mode)}
                 className={`relative py-0.5 text-[10px] font-black tracking-widest uppercase transition font-small cursor-pointer whitespace-nowrap ${
-                  isActive
-                    ? "text-cyan-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.6)]"
-                    : "text-zinc-400 hover:text-zinc-200"
+                  isActive ? "text-cyan-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.6)]" : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
                 {mode}
-                {isActive && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
-                )}
+                {isActive && <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.9)]" />}
               </button>
             )
           })}
         </div>
       </div>
 
-      {/* ── CENTER: CS2 9-Map Grid — fills all remaining space ─────────────── */}
-      <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2 py-1 px-4 sm:px-6">
-        {/* Row 1: 5 Map Cards — each row given flex-based height */}
-        <div className="grid grid-cols-5 gap-2 w-full max-w-6xl flex-1 min-h-0">
-          {SUBJECT_MAPS.slice(0, 5).map((subject) => {
-            const isSelected = selectedMapIds.includes(subject.id)
-            return (
-              <MapCard
-                key={subject.id}
-                subject={subject}
-                isSelected={isSelected}
-                onToggle={() => toggleMap(subject.id)}
-              />
-            )
-          })}
+      {/* ── CENTER: Map Grid — aspect-ratio cards, constrained to fit viewport height ── */}
+      <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2 px-3 py-1 overflow-hidden">
+        {/* Row 1 — 5 cards. Max width capped so card height (~4/3 * col_w) stays within half the center area */}
+        <div className="grid grid-cols-5 gap-2 w-full" style={{ maxWidth: "min(90vw, calc((100vh - 160px) * 0.55 * 5 / 4 + 32px))" }}>
+          {SUBJECT_MAPS.slice(0, 5).map((subject) => (
+            <MapCard
+              key={subject.id}
+              subject={subject}
+              isSelected={selectedMapIds.includes(subject.id)}
+              onToggle={() => toggleMap(subject.id)}
+            />
+          ))}
         </div>
-
-        {/* Row 2: 4 Map Cards (Centered) */}
-        <div className="grid grid-cols-4 gap-2 w-4/5 max-w-5xl flex-1 min-h-0">
-          {SUBJECT_MAPS.slice(5, 9).map((subject) => {
-            const isSelected = selectedMapIds.includes(subject.id)
-            return (
-              <MapCard
-                key={subject.id}
-                subject={subject}
-                isSelected={isSelected}
-                onToggle={() => toggleMap(subject.id)}
-              />
-            )
-          })}
+        {/* Row 2 — 4 cards, same column width as row 1 (80% of the 5-col grid) */}
+        <div className="grid grid-cols-4 gap-2 w-full" style={{ maxWidth: "min(72vw, calc((100vh - 160px) * 0.55 * 4 / 4 + 26px))" }}>
+          {SUBJECT_MAPS.slice(5, 9).map((subject) => (
+            <MapCard
+              key={subject.id}
+              subject={subject}
+              isSelected={selectedMapIds.includes(subject.id)}
+              onToggle={() => toggleMap(subject.id)}
+            />
+          ))}
         </div>
       </div>
 
-      {/* ── BOTTOM: CS2 Matchmaking Action Bar ── */}
+      {/* ── BOTTOM: Matchmaking Bar ── */}
       <div className={`relative shrink-0 w-full border-t transition-all duration-300 overflow-hidden ${
         isMatchmaking
           ? "border-emerald-500/60 bg-zinc-950/90 shadow-[0_-8px_30px_rgba(16,185,129,0.3)]"
-          : "border-white/10 bg-zinc-950/80 backdrop-blur-xl shadow-[0_-4px_25px_rgba(0,0,0,0.5)]"
+          : "border-white/10 bg-zinc-950/80 backdrop-blur-xl"
       }`}>
         {isMatchmaking && <MatrixRain />}
-
-        <div className="relative z-10 w-full px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4 flex-wrap">
+        <div className="relative z-10 w-full px-4 py-2.5 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 ${isMatchmaking ? "bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,1)] animate-ping" : "bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.9)]"}`} />
               <span className="text-xs font-black text-white font-main uppercase tracking-widest">
-                {isMatchmaking ? "CONFIRMING MATCHMAKING QUEUE" : `${selectedMapIds.length} ${selectedMapIds.length === 1 ? "Subject" : "Subjects"} Selected`}
+                {isMatchmaking ? "SEARCHING FOR MATCH" : `${selectedMapIds.length} ${selectedMapIds.length === 1 ? "Subject" : "Subjects"} Selected`}
               </span>
             </div>
-            <span className="text-zinc-600 text-xs">|</span>
+            <span className="text-zinc-600 text-xs hidden sm:inline">|</span>
             <span className="text-xs text-zinc-300 font-sub hidden sm:inline">
               Est. wait: <span className="text-amber-300 font-mono font-bold">~01:45</span>
             </span>
@@ -355,7 +338,7 @@ export default function PlayPage() {
             <button
               onClick={handleStartMatchmaking}
               disabled={selectedMapIds.length === 0}
-              className="px-10 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-950 font-black text-sm font-main tracking-widest uppercase border border-emerald-300/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_6px_20px_rgba(16,185,129,0.5)] hover:shadow-[0_8px_25px_rgba(16,185,129,0.7)] hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center gap-2 cursor-pointer"
+              className="px-10 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-950 font-black text-sm font-main tracking-widest uppercase border border-emerald-300/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_6px_20px_rgba(16,185,129,0.5)] hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center gap-2 cursor-pointer"
             >
               <Play className="w-4 h-4 fill-zinc-950 stroke-none" />
               <span>START MATCHMAKING</span>
@@ -364,8 +347,8 @@ export default function PlayPage() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2.5">
                 <Loader2 className="w-4 h-4 text-emerald-400 animate-spin drop-shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
-                <span className="text-sm font-black text-emerald-300 font-main tracking-widest uppercase drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]">
-                  SEARCHING... ({formatTime(queueTime)})
+                <span className="text-sm font-black text-emerald-300 font-main tracking-widest uppercase">
+                  {formatTime(queueTime)}
                 </span>
               </div>
               <button
@@ -381,6 +364,7 @@ export default function PlayPage() {
     </div>
   )
 }
+
 
 /**
  * Matrix Rain Digital Animation Canvas for Active Queue
@@ -458,7 +442,7 @@ function MapCard({
   return (
     <div
       onClick={onToggle}
-      className={`group/card relative p-2.5 flex flex-col justify-between overflow-hidden cursor-pointer select-none transition-all duration-200 ${
+      className={`group/card relative aspect-[3/4] p-2.5 flex flex-col justify-between overflow-hidden cursor-pointer select-none transition-all duration-200 ${
         isSelected
           ? "border-2 border-cyan-400 bg-cyan-950/20 shadow-[0_0_22px_rgba(34,211,238,0.4),inset_0_1px_1px_rgba(255,255,255,0.4)] brightness-110"
           : "border border-white/15 bg-black/40 hover:border-white/40 shadow-lg hover:brightness-105"

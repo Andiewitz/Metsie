@@ -82,3 +82,11 @@ body {
     0 12px 28px -4px rgba(0, 0, 0, 0.4);
   transform: translateY(-1px);
 }
+/* ── No scrollbar utility ── */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
