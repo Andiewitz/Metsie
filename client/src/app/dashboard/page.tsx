@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/AuthContext"
 import { GlassPanel } from "@/components/GlassPanel"
@@ -52,45 +52,12 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user, loading } = useAuth()
   const [selectedMode, setSelectedMode] = useState("ranked")
-  const [isSearching, setIsSearching] = useState(false)
-  const [searchTime, setSearchTime] = useState(0)
-
-  useEffect(() => {
-    if (!loading && !user) router.push("/login")
-  }, [user, loading, router])
-
-  useEffect(() => {
-    if (!isSearching) return
-
-    const interval = setInterval(() => {
-      setSearchTime((prev) => prev + 1)
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [isSearching])
-
-  const handleStartSearch = () => {
-    setSearchTime(0)
-    setIsSearching(true)
-  }
-
-  const handleCancelSearch = () => {
-    setIsSearching(false)
-    setSearchTime(0)
-  }
-
   if (loading || !user) {
     return (
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="w-10 h-10 border-2 border-amber-400 border-t-transparent rounded-full animate-spin drop-shadow-[0_0_12px_rgba(251,191,36,0.6)]" />
       </div>
     )
-  }
-
-  const formatTime = (secs: number) => {
-    const mins = Math.floor(secs / 60)
-    const rem = secs % 60
-    return `${mins}:${rem < 10 ? "0" : ""}${rem}`
   }
 
   return (
@@ -209,36 +176,13 @@ export default function DashboardPage() {
 
           {/* Big Glass Matchmaking Action CTA */}
           <div className="pt-2">
-            {!isSearching ? (
-              <button
-                onClick={() => router.push("/dashboard/play")}
-                className="w-full group/play relative py-4 px-8 rounded-2xl bg-gradient-to-r from-amber-500/90 via-orange-500/90 to-amber-500/90 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-black text-lg font-main tracking-wider uppercase border border-amber-200/80 shadow-[inset_0_2px_2px_rgba(255,255,255,0.8),0_10px_35px_rgba(245,158,11,0.5)] hover:shadow-[inset_0_2px_2px_rgba(255,255,255,0.9),0_15px_45px_rgba(245,158,11,0.7)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer"
-              >
-                <Play className="w-6 h-6 fill-zinc-950 stroke-none group-hover/play:scale-110 transition-transform" />
-                <span>SELECT MAPS & PLAY</span>
-              </button>
-            ) : (
-              <div className="p-4 rounded-2xl bg-black/40 border border-amber-400/40 shadow-[0_0_30px_rgba(245,158,11,0.25)] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin shadow-[0_0_10px_rgba(251,191,36,0.8)]" />
-                  <div>
-                    <p className="text-xs font-black text-white font-main uppercase tracking-wider">
-                      Searching for Opponents...
-                    </p>
-                    <p className="text-[11px] text-amber-300 font-mono font-bold">
-                      Queue Time: {formatTime(searchTime)}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleCancelSearch}
-                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-zinc-300 hover:text-rose-300 hover:border-rose-400/40 border border-white/20 text-xs font-black font-main uppercase transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+            <button
+              onClick={() => router.push("/dashboard/play")}
+              className="w-full group/play relative py-4 px-8 rounded-2xl bg-gradient-to-r from-amber-500/90 via-orange-500/90 to-amber-500/90 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-black text-lg font-main tracking-wider uppercase border border-amber-200/80 shadow-[inset_0_2px_2px_rgba(255,255,255,0.8),0_10px_35px_rgba(245,158,11,0.5)] hover:shadow-[inset_0_2px_2px_rgba(255,255,255,0.9),0_15px_45px_rgba(245,158,11,0.7)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer"
+            >
+              <Play className="w-6 h-6 fill-zinc-950 stroke-none group-hover/play:scale-110 transition-transform" />
+              <span>SELECT MAPS & PLAY</span>
+            </button>
           </div>
         </GlassPanel>
       </div>

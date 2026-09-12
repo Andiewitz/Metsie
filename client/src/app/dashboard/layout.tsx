@@ -7,6 +7,8 @@ import { useAuth } from "@/context/AuthContext"
 import { Home, Tv, Settings, Power } from "lucide-react"
 import { ProfileSidebar } from "@/components/ProfileSidebar"
 
+import { avatars } from "@/components/ui/avatar-picker"
+
 const TABS = [
   { label: "INVENTORY", href: "#" },
   { label: "LOADOUT",   href: "#" },
@@ -15,10 +17,27 @@ const TABS = [
   { label: "NEWS",      href: "#" },
 ]
 
+function HeaderAvatar() {
+  const [avatarId, setAvatarId] = React.useState(1)
+
+  React.useEffect(() => {
+    const sync = () => {
+      const saved = localStorage.getItem("metsie_avatar_id")
+      if (saved) setAvatarId(Number(saved))
+    }
+    sync()
+    window.addEventListener("metsie_avatar_changed", sync)
+    return () => window.removeEventListener("metsie_avatar_changed", sync)
+  }, [])
+
+  const found = avatars.find((a) => a.id === avatarId) || avatars[0]
+  return found.svg
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { logout } = useAuth()
+  const { user, logout } = useAuth()
 
   const handleLogout = async () => {
     await logout()
@@ -102,8 +121,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        {/* Right side spacer */}
-        <div className="w-8" />
+        {/* Right side: User Profile Avatar aligned with header height */}
+        <div className="flex items-center">
+          <Link
+            href="/dashboard/settings"
+            className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-white/10 border border-white/10 transition group/user"
+            title="Profile Settings"
+          >
+            <div className="relative shrink-0">
+              <div className="w-8 h-8 rounded-lg overflow-hidden border border-amber-300/80 bg-black/40 flex items-center justify-center shadow-[0_0_12px_rgba(251,191,36,0.3)] group-hover/user:scale-105 group-hover/user:border-amber-200 transition [&>svg]:w-full [&>svg]:h-full">
+                <HeaderAvatar />
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-black/80 shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
+            </div>
+            {user && (
+              <span className="hidden sm:inline-block text-xs font-black text-white font-main pr-1.5 drop-shadow-sm">
+                {user.profile?.full_name || user.username}
+              </span>
+            )}
+          </Link>
+        </div>
       </header>
 
       {/* ── Body: Main Canvas + Frosted Glass Profile Sidebar on the right ── */}

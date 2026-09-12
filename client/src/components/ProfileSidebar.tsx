@@ -1,8 +1,4 @@
-"use client"
-
-import React, { useState, useEffect } from "react"
-import Link from "next/link"
-import { useAuth } from "@/context/AuthContext"
+import React from "react"
 import { Wifi } from "lucide-react"
 import { avatars } from "@/components/ui/avatar-picker"
 
@@ -20,21 +16,6 @@ interface PlayerProfile {
 const ONLINE_PLAYERS: PlayerProfile[] = []
 
 export function ProfileSidebar() {
-  const { user } = useAuth()
-  const [userAvatarId, setUserAvatarId] = useState(1)
-
-  useEffect(() => {
-    const syncAvatar = () => {
-      const saved = localStorage.getItem("metsie_avatar_id")
-      if (saved) {
-        setUserAvatarId(Number(saved))
-      }
-    }
-    syncAvatar()
-    window.addEventListener("metsie_avatar_changed", syncAvatar)
-    return () => window.removeEventListener("metsie_avatar_changed", syncAvatar)
-  }, [])
-
   const getAvatarSvg = (avatarId: number) => {
     const found = avatars.find((a) => a.id === avatarId) || avatars[0]
     return found.svg
@@ -42,38 +23,14 @@ export function ProfileSidebar() {
 
   return (
     <aside className="group/sidebar relative w-16 hover:w-64 transition-all duration-300 ease-out shrink-0 backdrop-blur-xl bg-zinc-950/60 border-l border-white/10 shadow-[-8px_0_30px_rgba(0,0,0,0.4)] flex flex-col py-3 px-2 z-40 select-none overflow-hidden">
-      {/* ── TOP: Player's profile (slightly larger, at the very top) ── */}
-      {user && (
-        <div className="relative z-10 shrink-0 mb-3">
-          <Link
-            href="/dashboard/settings"
-            className="flex items-center gap-3 p-1 rounded-2xl hover:bg-white/10 transition group/user"
-            title="Profile Settings"
-          >
-            {/* Circular avatar with glowing glass border */}
-            <div className="relative shrink-0">
-              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-300/80 bg-black/40 flex items-center justify-center shadow-[0_0_15px_rgba(251,191,36,0.3)] group-hover/user:scale-105 group-hover/user:border-amber-200 transition [&>svg]:w-full [&>svg]:h-full">
-                {getAvatarSvg(userAvatarId)}
-              </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-black/80 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-            </div>
-
-            {/* Revealed on hover */}
-            <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 min-w-0 overflow-hidden whitespace-nowrap">
-              <p className="text-xs font-black text-white truncate font-main leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                {user.profile?.full_name || user.username}
-              </p>
-              <p className="text-[10px] text-emerald-300 font-small font-semibold flex items-center gap-1 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
-                In Lobby
-              </p>
-            </div>
-          </Link>
+      {/* ── TOP: Sidebar Header / Friends & Lobby List ── */}
+      <div className="relative z-10 shrink-0 mb-1 px-1">
+        <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 whitespace-nowrap overflow-hidden">
+          <p className="text-[10px] font-black text-amber-300 uppercase tracking-widest font-main">
+            Lobby & Friends
+          </p>
         </div>
-      )}
-
-      {/* Subtle divider */}
-      <div className="relative z-10 w-full h-px bg-white/10 mb-2 shrink-0" />
+      </div>
 
       {/* ── SPACER: Pushes the online players list to the bottom ── */}
       <div className="flex-1 relative z-10" />
