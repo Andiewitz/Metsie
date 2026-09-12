@@ -40,56 +40,23 @@ body {
 .font-sub   { font-family: var(--font-sub); }
 .font-small { font-family: var(--font-small); }
 
-/* ── Real Glass Refraction System ── */
+/* ── Frosted Glassmorphism System ── */
 .real-glass {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(9, 9, 11, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -1.5px 1.5px 0 rgba(0, 0, 0, 0.35),
-    inset 0 0 20px 0 rgba(255, 255, 255, 0.04),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.2),
     0 16px 40px -8px rgba(0, 0, 0, 0.5);
-}
-
-.real-glass-refractor {
-  position: absolute;
-  inset: -14px;
-  background-image: url('/background.png');
-  background-attachment: fixed;
-  background-size: cover;
-  background-position: center;
-  transform: scale(1.035);
-  filter: contrast(114%) brightness(107%) saturate(120%) url(#glass-refract-panel);
-  pointer-events: none;
-  z-index: -2;
-}
-
-.real-glass-refractor-bar {
-  position: absolute;
-  inset: -10px;
-  background-image: url('/background.png');
-  background-attachment: fixed;
-  background-size: cover;
-  background-position: center;
-  transform: scale(1.02);
-  filter: contrast(110%) brightness(105%) saturate(115%) url(#glass-refract-bar);
-  pointer-events: none;
-  z-index: -2;
 }
 
 .real-glass-sheen {
   position: absolute;
   inset: 0;
-  background: linear-gradient(130deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.03) 35%, transparent 65%, rgba(255, 255, 255, 0.08) 100%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.real-glass-tint {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.22) 100%);
+  background: linear-gradient(130deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 35%, transparent 65%, rgba(255, 255, 255, 0.04) 100%);
   pointer-events: none;
   z-index: -1;
 }
@@ -97,22 +64,21 @@ body {
 .real-glass-button {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(0, 0, 0, 0.2) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
   box-shadow:
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3),
-    0 8px 20px -4px rgba(0, 0, 0, 0.4);
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.4),
+    0 8px 20px -4px rgba(0, 0, 0, 0.3);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .real-glass-button:hover {
-  border-color: rgba(255, 255, 255, 0.55);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(0, 0, 0, 0.15) 100%);
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.16);
   box-shadow:
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3),
-    0 12px 28px -4px rgba(0, 0, 0, 0.5),
-    0 0 16px rgba(255, 255, 255, 0.15);
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6),
+    0 12px 28px -4px rgba(0, 0, 0, 0.4);
   transform: translateY(-1px);
 }

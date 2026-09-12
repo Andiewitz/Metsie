@@ -71,12 +71,8 @@ export default function ProfileSettingsPage() {
 
   return (
     <div className="absolute inset-0 z-30 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/40 overflow-y-auto animate-in fade-in-0 duration-200">
-      {/* Real Glass Settings Slab — Bends the sunset landscape directly behind it */}
-      <div className="relative w-full max-w-4xl rounded-[32px] border border-white/30 shadow-[inset_0_1.5px_1.5px_0_rgba(255,255,255,0.55),inset_0_-1.5px_1.5px_0_rgba(0,0,0,0.4),0_25px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col my-auto isolation-auto">
-        {/* Optical refraction layer */}
-        <div className="real-glass-refractor" />
-        <div className="real-glass-tint" />
-        <div className="real-glass-sheen" />
+      {/* Frosted Glass Settings Slab */}
+      <div className="relative w-full max-w-4xl rounded-[32px] backdrop-blur-2xl bg-zinc-950/75 border border-white/15 shadow-[inset_0_1px_1px_0_rgba(255,255,255,0.25),0_25px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col my-auto isolation-auto">
 
         {/* Modal Top Bar */}
         <div className="relative z-10 flex items-center justify-between px-6 sm:px-8 py-4 border-b border-white/15 bg-white/[0.04]">

@@ -98,7 +98,7 @@ export default function DashboardPage() {
       {/* ── TOP BAR INFO: Season & Player Stats ── */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         {/* Season pill */}
-        <GlassPanel className="px-4 py-2 flex items-center gap-3 rounded-2xl" refractScale={1.03}>
+        <GlassPanel className="px-4 py-2 flex items-center gap-3 rounded-2xl">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping shadow-[0_0_8px_rgba(251,191,36,1)]" />
             <span className="text-xs font-black tracking-wider text-white uppercase font-main">
@@ -112,7 +112,7 @@ export default function DashboardPage() {
         </GlassPanel>
 
         {/* Player competitive rank pill */}
-        <GlassPanel className="px-5 py-2 flex items-center gap-4 rounded-2xl" refractScale={1.03} glow>
+        <GlassPanel className="px-5 py-2 flex items-center gap-4 rounded-2xl" glow>
           <div className="flex items-center gap-2.5">
             <Shield className="w-4 h-4 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
             <div>
@@ -135,9 +135,7 @@ export default function DashboardPage() {
       {/* ── CENTER: Primary Matchmaking Glass Slab ── */}
       <div className="my-auto py-6 flex items-center justify-center">
         <GlassPanel
-          className="w-full max-w-2xl p-6 sm:p-8 rounded-[32px] border border-white/30"
-          refractScale={1.05}
-          filterId="glass-refract-panel"
+          className="w-full max-w-2xl p-6 sm:p-8 rounded-[32px] border border-white/20"
           glow
         >
           {/* Header */}
@@ -247,14 +245,14 @@ export default function DashboardPage() {
 
       {/* ── BOTTOM BAR: Active Queue Status & Leaderboard Preview ── */}
       <div className="flex items-center justify-between gap-4 text-xs font-sub text-zinc-300">
-        <GlassPanel className="px-4 py-2.5 rounded-2xl flex items-center gap-3" refractScale={1.02}>
+        <GlassPanel className="px-4 py-2.5 rounded-2xl flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,1)]" />
           <span className="font-bold text-white drop-shadow-sm font-sub">
             Matchmaking Server: <span className="text-amber-300 font-mono">1,248 Players Active</span>
           </span>
         </GlassPanel>
 
-        <GlassPanel className="hidden sm:flex px-4 py-2.5 rounded-2xl items-center gap-4" refractScale={1.02}>
+        <GlassPanel className="hidden sm:flex px-4 py-2.5 rounded-2xl items-center gap-4">
           <span className="font-extrabold text-amber-200 uppercase tracking-wider text-[10px] font-small">
             Daily Leaderboard #1:
           </span>

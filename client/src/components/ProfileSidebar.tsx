@@ -41,12 +41,7 @@ export function ProfileSidebar() {
   }
 
   return (
-    <aside className="group/sidebar relative w-16 hover:w-64 transition-all duration-300 ease-out shrink-0 border-l border-white/20 shadow-[inset_1.5px_0_1.5px_0_rgba(255,255,255,0.45),-8px_0_30px_rgba(0,0,0,0.4)] flex flex-col py-3 px-2 z-40 select-none overflow-hidden">
-      {/* ── Refractive Glass Optics: bends the sunset landscape behind the sidebar ── */}
-      <div className="real-glass-refractor" />
-      <div className="real-glass-tint" />
-      <div className="real-glass-sheen" />
-
+    <aside className="group/sidebar relative w-16 hover:w-64 transition-all duration-300 ease-out shrink-0 backdrop-blur-xl bg-zinc-950/60 border-l border-white/10 shadow-[-8px_0_30px_rgba(0,0,0,0.4)] flex flex-col py-3 px-2 z-40 select-none overflow-hidden">
       {/* ── TOP: Player's profile (slightly larger, at the very top) ── */}
       {user && (
         <div className="relative z-10 shrink-0 mb-3">
@@ -55,7 +50,7 @@ export function ProfileSidebar() {
             className="flex items-center gap-3 p-1 rounded-2xl hover:bg-white/10 transition group/user"
             title="Profile Settings"
           >
-            {/* Circular avatar with glowing glass bevel */}
+            {/* Circular avatar with glowing glass border */}
             <div className="relative shrink-0">
               <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-300/80 bg-black/40 flex items-center justify-center shadow-[0_0_15px_rgba(251,191,36,0.3)] group-hover/user:scale-105 group-hover/user:border-amber-200 transition [&>svg]:w-full [&>svg]:h-full">
                 {getAvatarSvg(userAvatarId)}
@@ -77,8 +72,8 @@ export function ProfileSidebar() {
         </div>
       )}
 
-      {/* Subtle glass divider */}
-      <div className="relative z-10 w-full h-px bg-white/15 mb-2 shrink-0 shadow-[0_1px_1px_rgba(255,255,255,0.2)]" />
+      {/* Subtle divider */}
+      <div className="relative z-10 w-full h-px bg-white/10 mb-2 shrink-0" />
 
       {/* ── SPACER: Pushes the online players list to the bottom ── */}
       <div className="flex-1 relative z-10" />
@@ -95,7 +90,7 @@ export function ProfileSidebar() {
         {/* List of players or clean empty state */}
         <div className="flex flex-col gap-1 max-h-[50vh] overflow-y-auto no-scrollbar">
           {ONLINE_PLAYERS.length === 0 ? (
-            <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 px-2.5 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
+            <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 px-2.5 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
               <p className="text-[11px] text-zinc-200 font-bold font-sub">No other players online</p>
               <p className="text-[9px] text-zinc-400 font-small mt-0.5">Lobby ready for matchmaking</p>
             </div>
@@ -129,7 +124,7 @@ export function ProfileSidebar() {
         </div>
 
         {/* Bottom ping/server status */}
-        <div className="pt-2 mt-1 border-t border-white/15 flex items-center gap-2.5 px-1.5 text-zinc-300">
+        <div className="pt-2 mt-1 border-t border-white/10 flex items-center gap-2.5 px-1.5 text-zinc-300">
           <Wifi className="h-3.5 w-3.5 text-emerald-400 shrink-0 drop-shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
           <span className="text-[10px] text-zinc-200 font-mono font-bold opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 whitespace-nowrap drop-shadow-sm">
             18ms · US East

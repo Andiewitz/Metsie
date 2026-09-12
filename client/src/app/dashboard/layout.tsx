@@ -27,24 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden select-none bg-zinc-950">
-      {/* ── Global SVG Optical Displacement Filters (Bends pixels like real glass) ── */}
-      <svg className="fixed top-0 left-0 w-0 h-0 pointer-events-none opacity-0 select-none -z-50" aria-hidden="true">
-        <defs>
-          {/* Main glass panel optical refraction (undulating light bending) */}
-          <filter id="glass-refract-panel" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.015 0.02" numOctaves="2" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-
-          {/* Subtle bar refraction for headers and narrow slabs */}
-          <filter id="glass-refract-bar" x="-10%" y="-10%" width="120%" height="120%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.03" numOctaves="1" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="B" />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* ── Fullscreen Real World Background (Sunset Hills PNG) ── */}
+      {/* ── Fullscreen Background (Sunset Hills PNG) ── */}
       <div
         className="fixed inset-0 bg-cover bg-center bg-no-repeat pointer-events-none -z-30"
         style={{ backgroundImage: "url('/background.png')" }}
@@ -53,24 +36,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── Subtle Atmospheric Sunset Depth Gradient ── */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/15 to-black/35 pointer-events-none -z-20" />
 
-      {/* ── Top Header Navbar (Real Glass Bar) ─────────────────────────── */}
-      <header className="relative z-50 flex items-center justify-between h-12 px-4 shrink-0 overflow-hidden border-b border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
-        {/* Refractive background slice: bends the sky behind the bar */}
-        <div className="real-glass-refractor-bar" />
-        <div className="real-glass-tint" />
-        <div className="real-glass-sheen" />
-
+      {/* ── Top Header Navbar (Frosted Glass Bar) ─────────────────────────── */}
+      <header className="relative z-50 flex items-center justify-between h-12 px-4 shrink-0 backdrop-blur-xl bg-zinc-950/60 border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
         {/* Left: Quick Actions (Home, Watch, Settings, Power) */}
-        <div className="relative z-10 flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5">
           <Link
             href="/"
-            className="p-2 rounded-xl border border-white/10 bg-white/[0.06] hover:bg-white/20 text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] transition"
+            className="p-2 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-white/15 text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] transition"
             title="Home"
           >
             <Home className="h-4 w-4" />
           </Link>
           <button
-            className="p-2 rounded-xl border border-white/10 bg-white/[0.06] hover:bg-white/20 text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] transition cursor-pointer"
+            className="p-2 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-white/15 text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] transition cursor-pointer"
             title="Watch / Matches"
           >
             <Tv className="h-4 w-4" />
@@ -80,7 +58,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             className={`p-2 rounded-xl border transition ${
               pathname === "/dashboard/settings"
                 ? "border-violet-400/60 bg-violet-500/25 text-violet-200 shadow-[0_0_16px_rgba(167,139,250,0.4)]"
-                : "border-white/10 bg-white/[0.06] hover:bg-white/20 text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
+                : "border-white/10 bg-white/[0.05] hover:bg-white/15 text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]"
             }`}
             title="User Profile Settings"
           >
@@ -88,7 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Link>
           <button
             onClick={handleLogout}
-            className="p-2 rounded-xl border border-white/10 bg-white/[0.06] hover:bg-red-500/20 text-zinc-300 hover:text-red-400 hover:border-red-500/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] transition cursor-pointer"
+            className="p-2 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-red-500/20 text-zinc-300 hover:text-red-400 hover:border-red-500/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] transition cursor-pointer"
             title="Exit / Logout"
           >
             <Power className="h-4 w-4" />
@@ -121,10 +99,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* Right side spacer */}
-        <div className="w-8 relative z-10" />
+        <div className="w-8" />
       </header>
 
-      {/* ── Body: Main Canvas + Real Glass Profile Sidebar on the right ── */}
+      {/* ── Body: Main Canvas + Frosted Glass Profile Sidebar on the right ── */}
       <div className="flex-1 flex overflow-hidden relative">
         <main className="flex-1 relative overflow-hidden">
           {children}
