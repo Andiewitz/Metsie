@@ -211,11 +211,11 @@ export default function DashboardPage() {
           <div className="pt-2">
             {!isSearching ? (
               <button
-                onClick={handleStartSearch}
+                onClick={() => router.push("/dashboard/play")}
                 className="w-full group/play relative py-4 px-8 rounded-2xl bg-gradient-to-r from-amber-500/90 via-orange-500/90 to-amber-500/90 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-black text-lg font-main tracking-wider uppercase border border-amber-200/80 shadow-[inset_0_2px_2px_rgba(255,255,255,0.8),0_10px_35px_rgba(245,158,11,0.5)] hover:shadow-[inset_0_2px_2px_rgba(255,255,255,0.9),0_15px_45px_rgba(245,158,11,0.7)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer"
               >
                 <Play className="w-6 h-6 fill-zinc-950 stroke-none group-hover/play:scale-110 transition-transform" />
-                <span>FIND MATCH</span>
+                <span>SELECT MAPS & PLAY</span>
               </button>
             ) : (
               <div className="p-4 rounded-2xl bg-black/40 border border-amber-400/40 shadow-[0_0_30px_rgba(245,158,11,0.25)] flex items-center justify-between">

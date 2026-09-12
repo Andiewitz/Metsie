@@ -10,7 +10,7 @@ import { ProfileSidebar } from "@/components/ProfileSidebar"
 const TABS = [
   { label: "INVENTORY", href: "#" },
   { label: "LOADOUT",   href: "#" },
-  { label: "PLAY",      href: "/dashboard" },
+  { label: "PLAY",      href: "/dashboard/play" },
   { label: "STORE",     href: "#" },
   { label: "NEWS",      href: "#" },
 ]
@@ -38,12 +38,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* ── Top Header Navbar (Frosted Glass Bar) ─────────────────────────── */}
       <header className="relative z-50 flex items-center justify-between h-12 px-4 shrink-0 backdrop-blur-xl bg-zinc-950/60 border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
-        {/* Left: Quick Actions (Home, Watch, Settings, Power) */}
+        {/* Left: Quick Actions (Home -> Main Dashboard, Watch, Settings, Power) */}
         <div className="flex items-center gap-1.5">
           <Link
-            href="/"
-            className="p-2 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-white/15 text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] transition"
-            title="Home"
+            href="/dashboard"
+            className={`p-2 rounded-xl border transition ${
+              pathname === "/dashboard"
+                ? "border-amber-400/50 bg-amber-400/15 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]"
+                : "border-white/10 bg-white/[0.05] hover:bg-white/15 text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]"
+            }`}
+            title="Main Dashboard"
           >
             <Home className="h-4 w-4" />
           </Link>
@@ -77,7 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav className="fixed top-0 left-1/2 -translate-x-1/2 h-12 z-50 flex items-center gap-7 pointer-events-auto">
           {TABS.map(({ label, href }) => {
             const isPlay = label === "PLAY"
-            const isActive = isPlay && pathname === "/dashboard"
+            const isActive = isPlay ? pathname === "/dashboard/play" : pathname === href
 
             return (
               <Link
