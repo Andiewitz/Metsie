@@ -1,126 +1,114 @@
 # Metsie Railway Deployment Guide
 
-> Railway deploys Metsie as two separate services (**Backend** + **Frontend**) connected to a managed **PostgreSQL** database.
+> **Single-Instance Deployment**: Metsie runs as **one unified service** on Railway. An internal **Nginx** reverse proxy routes incoming traffic to the **Next.js frontend** and the **Django backend** inside the same container, connecting to a managed **PostgreSQL** database.
 
 ---
 
 ## Architecture on Railway
 
 ```
-Internet → Frontend Service (Next.js) → /api/* → Backend Service (Django)
-                                                         ↓
-                                               PostgreSQL Plugin (DB)
+                   Internet (https://<your-app>.up.railway.app)
+                                       │
+                                       ▼
+                       Railway Edge SSL ($PORT)
+                                       │
+                                       ▼
+                     ┌───────────────────────────────────┐
+                     │          Nginx Reverse Proxy       │
+                     │  (listens on Railway's $PORT)     │
+                     └───────────────┬───────────────────┘
+                                     │
+                 ┌───────────────────┴───────────────────┐
+                 │                                       │
+         / (all page routes)                   /api/* and /admin/*
+                 │                                       │
+                 ▼                                       ▼
+      Next.js (Node 20)                       Django 5.1 (Gunicorn)
+      127.0.0.1:3001                          127.0.0.1:8000
+                                                         │
+                                                         ▼
+                                              PostgreSQL Plugin (DB)
+                                              (via DATABASE_URL)
 ```
 
-- **Frontend**: Next.js 16 container, serves the UI, proxies `/api/*` to the Backend internally.
-- **Backend**: Django 5.1 + Gunicorn, handles auth, JWT cookies, and all API logic.
-- **Database**: Railway Postgres plugin — `DATABASE_URL` is auto-injected into the Backend.
+### Key Advantages
+- **Single Service**: Only 1 web service to pay for and manage on Railway.
+- **Same-Origin**: Frontend and API share the exact same domain. Zero CORS issues and 7-day `httpOnly` cookies work out of the box with `SameSite=Lax`.
+- **Fast Static Files**: Nginx serves `/static/` directly from disk with caching headers.
+- **Supervisord Management**: Automatic process monitoring, auto-restart on crashes.
 
 ---
 
 ## Prerequisites
 
 - A [Railway](https://railway.app) account
-- Your GitHub repo connected to Railway
-- The Metsie repo at `github.com/Andiewitz/Metsie`
+- The Metsie repo at [github.com/Andiewitz/Metsie](https://github.com/Andiewitz/Metsie)
 
 ---
 
-## Step 1 — Create a New Railway Project
+## Step 1 — Create Project & Deploy
 
 1. Go to [railway.app/new](https://railway.app/new)
-2. Click **Deploy from GitHub repo**
-3. Select **Andiewitz/Metsie**
+2. Select **Deploy from GitHub repo** → pick **Andiewitz/Metsie**
+3. Railway automatically detects the root `railway.json` and builds via the root `Dockerfile`.
 
 ---
 
-## Step 2 — Add the PostgreSQL Plugin
+## Step 2 — Add PostgreSQL Database
 
-1. In your project dashboard, click **+ New** → **Database** → **Add PostgreSQL**
-2. Railway provisions Postgres 16 and creates a `DATABASE_URL` variable automatically.
-
----
-
-## Step 3 — Deploy the Backend Service
-
-### Settings
-- **Root Directory**: `services`
-- **Dockerfile Path**: `Dockerfile`
-- **Service Name**: `metsie-backend`
-
-### Environment Variables
-
-| Variable | Value |
-|---|---|
-| `DJANGO_SECRET_KEY` | Generate: `python -c "import secrets; print(secrets.token_urlsafe(50))"` |
-| `JWT_SECRET_KEY` | Generate a separate strong random key |
-| `DEBUG` | `False` |
-| `ENVIRONMENT` | `production` |
-| `COOKIE_SECURE` | `True` |
-| `CORS_ALLOWED_ORIGINS` | `https://<frontend-domain>.up.railway.app` |
-| `CSRF_TRUSTED_ORIGINS` | `https://<frontend-domain>.up.railway.app` |
-
-**Link `DATABASE_URL`** from the Postgres plugin via the Variables tab → **+ Link Variable**.
-
-`RAILWAY_PUBLIC_DOMAIN` and `PORT` are injected automatically by Railway.
+1. In the project canvas, click **+ New** → **Database** → **Add PostgreSQL**
+2. In your Metsie service → **Variables** tab:
+   - Click **+ Link Variable** → choose the Postgres service → link `DATABASE_URL`
+   *(Railway automatically injects the connection string into the app).*
 
 ---
 
-## Step 4 — Deploy the Frontend Service
+## Step 3 — Set Environment Variables
 
-### Settings
-- **Root Directory**: `client`
-- **Dockerfile Path**: `Dockerfile`
-- **Service Name**: `metsie-frontend`
+In your Metsie service → **Variables** tab, configure the following:
 
-### Environment Variables
+| Variable | Value | Description |
+|---|---|---|
+| `DJANGO_SECRET_KEY` | `python -c "import secrets; print(secrets.token_urlsafe(50))"` | Strong random Django secret key |
+| `JWT_SECRET_KEY` | Strong random string (different from Django secret) | Signs the 7-day auth tokens |
+| `DEBUG` | `False` | Disables debug mode in production |
+| `ENVIRONMENT` | `production` | Production mode |
+| `COOKIE_SECURE` | `True` | Enforces HTTPS on the auth cookie |
+| `DATABASE_URL` | *(Linked from Postgres plugin)* | Auto-injected by Railway |
 
-| Variable | Value |
-|---|---|
-| `BACKEND_INTERNAL_URL` | `https://<backend-domain>.up.railway.app` |
-| `NODE_ENV` | `production` |
+> [!NOTE]
+> `PORT`, `RAILWAY_PUBLIC_DOMAIN`, and `NODE_ENV` are handled automatically.
+> `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` automatically permit all `*.railway.app` and `*.up.railway.app` domains out of the box.
 
-> **Tip**: For private networking (lower latency), use `http://metsie-backend.railway.internal:8000` instead.
+---
+
+## Step 4 — Generate a Public Domain
+
+1. In your service settings, click **Settings** → **Networking** → **Generate Domain**.
+2. Railway will give you a public URL like `https://metsie-production.up.railway.app`.
+3. Open the URL in your browser — your full app (Next.js + Django API) is live!
 
 ---
 
 ## Step 5 — Verify Live Production
 
 ```bash
-# Backend health (expect 401 — service is up, just unauthenticated)
-curl -I https://<backend>.up.railway.app/api/auth/me/
+# 1. Health check (returns 200 OK from Next.js home page)
+curl -I https://<your-app>.up.railway.app/
 
-# Login with a real user (expect 200 + Set-Cookie)
-curl -X POST https://<frontend>.up.railway.app/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username_or_email": "youruser", "password": "yourpassword"}'
+# 2. Django API session check (returns 401 Unauthorized because no cookie sent yet — backend is live)
+curl -I https://<your-app>.up.railway.app/api/auth/me/
 
-# Confirm dev backdoor is gone (expect 400)
-curl -X POST https://<frontend>.up.railway.app/api/auth/login \
+# 3. Verify former dev backdoor is eliminated (returns 400 Bad Request)
+curl -X POST https://<your-app>.up.railway.app/api/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"username_or_email": "dev@metsie.local", "password": "devpassword123"}'
 ```
 
 ---
 
-## Environment Variable Reference
+## Troubleshooting
 
-### Backend (`services/`)
-
-| Variable | Required | Description |
-|---|---|---|
-| `DJANGO_SECRET_KEY` | ✅ | Django secret — generate fresh for production |
-| `JWT_SECRET_KEY` | ✅ | JWT signing key — different from SECRET_KEY |
-| `DATABASE_URL` | ✅ (auto) | Injected by Railway Postgres plugin |
-| `DEBUG` | ✅ | `False` in production |
-| `ENVIRONMENT` | ✅ | `production` |
-| `COOKIE_SECURE` | ✅ | `True` (Railway uses HTTPS) |
-| `CORS_ALLOWED_ORIGINS` | ✅ | Frontend Railway URL |
-| `CSRF_TRUSTED_ORIGINS` | ✅ | Frontend Railway URL |
-
-### Frontend (`client/`)
-
-| Variable | Required | Description |
-|---|---|---|
-| `BACKEND_INTERNAL_URL` | ✅ | Backend service URL |
-| `NODE_ENV` | ✅ | `production` |
+- **Container Logs**: Go to **Deployments** → click the latest deploy → **Deploy Logs**. Supervisord logs output from `django`, `nextjs`, and `nginx` with clear prefixes.
+- **Database Migrations**: `start.sh` automatically runs `python manage.py migrate --noinput` on container start before launching services.
+- **Static Assets**: `collectstatic` runs on container boot to ensure Django Admin assets are up to date.

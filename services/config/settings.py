@@ -15,10 +15,12 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-default-dev-key-cha
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development" if DEBUG else "production").lower()
 
-# ALLOWED_HOSTS — always include Railway's public domain automatically
+# ALLOWED_HOSTS — always include Railway's public domains and localhost automatically
 _raw_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
 ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()]
-# Automatically include Railway-injected public domain (e.g. metsie-backend.up.railway.app)
+for _d in [".railway.app", ".up.railway.app", "localhost", "127.0.0.1"]:
+    if _d not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_d)
 _railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN", "")
 if _railway_domain and _railway_domain not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(_railway_domain)
@@ -143,6 +145,9 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # CSRF trusted origins — include Railway domain and any configured origins
 _csrf_origins_raw = os.getenv("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins_raw.split(",") if o.strip()]
+for _origin in ["https://*.railway.app", "https://*.up.railway.app", "http://localhost", "http://127.0.0.1"]:
+    if _origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_origin)
 if _railway_domain and f"https://{_railway_domain}" not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append(f"https://{_railway_domain}")
 
