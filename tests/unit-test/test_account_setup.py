@@ -43,7 +43,6 @@ class AccountSetupTests(TestCase):
         # Submit onboarding info
         payload = {
             "full_name": "Ada Lovelace",
-            "company": "Analytical Engine Corp",
             "role": "Chief Mathematician",
             "bio": "Pioneering computer algorithms since 1843.",
         }
@@ -54,7 +53,7 @@ class AccountSetupTests(TestCase):
         self.assertEqual(data["message"], "Account setup completed successfully.")
         self.assertTrue(data["user"]["profile"]["is_onboarded"])
         self.assertEqual(data["user"]["profile"]["full_name"], "Ada Lovelace")
-        self.assertEqual(data["user"]["profile"]["company"], "Analytical Engine Corp")
+        self.assertEqual(data["user"]["profile"]["role"], "Chief Mathematician")
 
         # Verify database reflection
         self.user.refresh_from_db()

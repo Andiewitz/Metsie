@@ -162,25 +162,13 @@ Metsie enforces **zero-trust browser storage principles**:
 
 ---
 
-## 5. Development Credentials & Mock System
+## 5. Authentication & Security Model
 
-To ensure smooth local testing without constant account recreation, Metsie includes an automated development credentials mechanism:
-
-### Credentials
-- **Username / Email**: `dev` or `dev@metsie.local`
-- **Password**: `devpassword123`
-
-### Security Guardrails
-- **In Development** (`ENVIRONMENT=development` and `DEBUG=True`):
-  - Automatically provisions the `dev` user if not found.
-  - Ensures password matches `devpassword123`.
-  - Auto-onboards the user profile (`is_onboarded=True`, role: "Lead Developer").
-  - Returns `200 OK` with a valid 7-day cookie.
-- **In Production** (`ENVIRONMENT=production` or `DEBUG=False`):
-  - Any attempt to use `dev` or `dev@metsie.local` triggers `rest_framework.exceptions.PermissionDenied`.
-  - Returns `403 Forbidden` with `"Development credentials are forbidden in production."`.
-- **Frontend Toggle**:
-  - `NEXT_PUBLIC_DEV_CREDENTIALS_ENABLED=true` in `client/.env.local` renders a quick "Autofill" helper card on `/login`.
+Metsie uses strict standard authentication across all environments:
+- **Zero Backdoors**: All development dummy credentials and backdoor bypasses have been eliminated.
+- **Database Backed**: Authentication validates directly against Django's `User` model using PBKDF2/Argon2.
+- **Session Delivery**: 7-day `httpOnly`, `SameSite=Lax`, `Secure` JWT cookie (`access_token`).
+- **Security Verification**: Validated by `tests/unit-test/test_production_security.py` ensuring former dev credentials cannot bypass auth.
 
 ---
 

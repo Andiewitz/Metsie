@@ -6,7 +6,6 @@ import { apiFetch } from '@/lib/api';
 export interface UserProfile {
   full_name: string;
   bio: string;
-  company: string;
   role: string;
   is_onboarded: boolean;
   updated_at?: string;
@@ -29,7 +28,7 @@ interface AuthContextType {
   register: (username: string, email: string, password: string, passwordConfirm: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<User | null>;
-  setupAccount: (data: { full_name: string; company?: string; role?: string; bio?: string }) => Promise<void>;
+  setupAccount: (data: { full_name: string; role?: string; bio?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -108,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const setupAccount = async (data: { full_name: string; company?: string; role?: string; bio?: string }) => {
+  const setupAccount = async (data: { full_name: string; role?: string; bio?: string }) => {
     const res = await apiFetch<{ message: string; user: User }>('/api/auth/account-setup/', {
       method: 'POST',
       body: JSON.stringify(data),

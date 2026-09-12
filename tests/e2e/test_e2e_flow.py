@@ -47,7 +47,6 @@ class AuthenticationE2EFlowTests(TestCase):
             self.account_setup_url,
             {
                 "full_name": "E2E Lifecycle Tester",
-                "company": "Metsie Labs",
                 "role": "Automation Specialist",
                 "bio": "Verifying complete decoupled authentication flow.",
             },
@@ -85,4 +84,4 @@ class AuthenticationE2EFlowTests(TestCase):
         restored_me = self.client.get(self.me_url)
         self.assertEqual(restored_me.status_code, status.HTTP_200_OK)
         self.assertTrue(restored_me.json()["user"]["profile"]["is_onboarded"])
-        self.assertEqual(restored_me.json()["user"]["profile"]["company"], "Metsie Labs")
+        self.assertEqual(restored_me.json()["user"]["profile"]["role"], "Automation Specialist")

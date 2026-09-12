@@ -10,7 +10,6 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     full_name = models.CharField(max_length=150, blank=True, default="")
     bio = models.TextField(blank=True, default="")
-    company = models.CharField(max_length=100, blank=True, default="")
     role = models.CharField(max_length=100, blank=True, default="")
     is_onboarded = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

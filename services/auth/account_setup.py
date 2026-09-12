@@ -16,13 +16,12 @@ class AccountSetupSerializer(serializers.ModelSerializer):
     """Validates and applies user profile onboarding data."""
 
     full_name = serializers.CharField(max_length=150, required=True)
-    company = serializers.CharField(max_length=100, required=False, allow_blank=True)
     role = serializers.CharField(max_length=100, required=False, allow_blank=True)
     bio = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = UserProfile
-        fields = ["full_name", "company", "role", "bio"]
+        fields = ["full_name", "role", "bio"]
 
 
 class AccountSetupView(APIView):
@@ -37,7 +36,6 @@ class AccountSetupView(APIView):
             {
                 "is_onboarded": profile.is_onboarded,
                 "full_name": profile.full_name,
-                "company": profile.company,
                 "role": profile.role,
                 "bio": profile.bio,
             },
