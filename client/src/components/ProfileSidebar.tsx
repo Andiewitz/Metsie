@@ -1,4 +1,8 @@
-import React from "react"
+"use client"
+
+import React, { useState, useEffect } from "react"
+import Link from "next/link"
+import { useAuth } from "@/context/AuthContext"
 import { Wifi } from "lucide-react"
 import { avatars } from "@/components/ui/avatar-picker"
 
@@ -16,24 +20,69 @@ interface PlayerProfile {
 const ONLINE_PLAYERS: PlayerProfile[] = []
 
 export function ProfileSidebar() {
+  const { user } = useAuth()
+  const [userAvatarId, setUserAvatarId] = useState(1)
+
+  useEffect(() => {
+    const syncAvatar = () => {
+      const saved = localStorage.getItem("metsie_avatar_id")
+      if (saved) {
+        setUserAvatarId(Number(saved))
+      }
+    }
+    syncAvatar()
+    window.addEventListener("metsie_avatar_changed", syncAvatar)
+    return () => window.removeEventListener("metsie_avatar_changed", syncAvatar)
+  }, [])
+
   const getAvatarSvg = (avatarId: number) => {
     const found = avatars.find((a) => a.id === avatarId) || avatars[0]
     return found.svg
   }
 
   return (
-    <aside className="group/sidebar relative w-16 hover:w-64 transition-all duration-300 ease-out shrink-0 backdrop-blur-xl bg-zinc-950/60 border-l border-white/10 shadow-[-8px_0_30px_rgba(0,0,0,0.4)] flex flex-col py-3 px-2 z-40 select-none overflow-hidden">
-      {/* ── TOP: Sidebar Header / Friends & Lobby List ── */}
-      <div className="relative z-10 shrink-0 mb-1 px-1">
+    <aside className="group/sidebar fixed top-0 right-0 bottom-0 w-16 hover:w-64 transition-all duration-300 ease-out shrink-0 backdrop-blur-2xl bg-zinc-950/75 border-l border-white/10 shadow-[-10px_0_35px_rgba(0,0,0,0.6)] flex flex-col z-50 select-none overflow-hidden">
+      {/* ── TOP: Player's Profile (Sitting at the exact same height as the top header: h-12) ── */}
+      <div className="h-12 shrink-0 flex items-center px-2.5 border-b border-white/10 bg-zinc-950/40">
+        <Link
+          href="/dashboard/settings"
+          className="flex items-center gap-3 w-full p-1 rounded-xl hover:bg-white/10 transition group/user"
+          title="Profile Settings"
+        >
+          {/* Avatar with glowing border */}
+          <div className="relative shrink-0">
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-amber-300/80 bg-black/50 flex items-center justify-center shadow-[0_0_12px_rgba(251,191,36,0.35)] group-hover/user:scale-105 group-hover/user:border-amber-200 transition [&>svg]:w-full [&>svg]:h-full">
+              {getAvatarSvg(userAvatarId)}
+            </div>
+            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-black/90 shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
+          </div>
+
+          {/* Revealed on sidebar hover */}
+          {user && (
+            <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 min-w-0 overflow-hidden whitespace-nowrap">
+              <p className="text-xs font-black text-white truncate font-main leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                {user.profile?.full_name || user.username}
+              </p>
+              <p className="text-[10px] text-emerald-300 font-small font-semibold flex items-center gap-1 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
+                In Lobby
+              </p>
+            </div>
+          )}
+        </Link>
+      </div>
+
+      {/* ── SUB-HEADER: Lobby & Friends ── */}
+      <div className="shrink-0 pt-2 px-3">
         <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 whitespace-nowrap overflow-hidden">
-          <p className="text-[10px] font-black text-amber-300 uppercase tracking-widest font-main">
+          <p className="text-[10px] font-black text-amber-300/90 uppercase tracking-widest font-main">
             Lobby & Friends
           </p>
         </div>
       </div>
 
-      {/* ── SPACER: Pushes the online players list to the bottom ── */}
-      <div className="flex-1 relative z-10" />
+      {/* ── SPACER ── */}
+      <div className="flex-1" />
 
       {/* ── BOTTOM: Players Online List ── */}
       <div className="relative z-10 mt-auto flex flex-col gap-1.5 shrink-0">
